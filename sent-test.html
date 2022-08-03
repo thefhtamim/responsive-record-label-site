@@ -10,6 +10,12 @@
       <meta property="og:image" content="https://i.ibb.co/zGjnm52/Copy-of-Arteon-Records.png">
       <link rel="stylesheet" href="styles/main.css">
       <script type="text/javascript" src="js/script.js"></script>
+      
+      <!-- widget stuff here -->
+<script src="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.16.0/js/okta-sign-in.min.js" type="text/javascript"></script>
+<link href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.16.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
+<link href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.16.0/css/okta-theme.css" type="text/css" rel="stylesheet"/>
+      
 </head>
 <body>
 
@@ -60,7 +66,7 @@
         </div>
         
   </main>  -->
-        
+        <div id="okta-login-container"></div>
       
                <div>  
                      <iframe width="100%" height= "10000000px" src= "https://forms.office.com/Pages/ResponsePage.aspx?id=AyTYEFvzTUyXU-EhMPZz64G9uXkqumtNm3DmlWdzXLBUMEYxQlpNNkNFODhZWUFOWTBSSjJDWlNZSC4u&embed=true" frameborder= "0" marginwidth= "0" marginheight= "0" style= "border: none; max-width:100vw; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
@@ -70,6 +76,56 @@
       <!-- Bothelp.io widget -->
 <script type="text/javascript">!function(){var e={"buttons":[{"type":"instagram","token":"the_arteon_"},{"type":"email","token":"thearteonmusic@gmail.com"}],"color":"#6EF059","position":"right","bottomSpacing":"","callToActionMessage":"Message Us","displayOn":"everywhere","lang":"en"},t=document.location.protocol+"//bothelp.io",o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=t+"/widget-folder/widget-page.js",o.onload=function(){new BhWidgetPage.init(e)};var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(o,n)}();</script>
 <!-- /Bothelp.io widget -->
+      
 
+      
+      <!-- use the Okta widget to power authentication! -->
+<script type="text/javascript">
+  var oktaSignIn = new OktaSignIn({
+    baseUrl: "{{ dev-68768573.okta.com }}",
+    clientId: "{{ 0oa61mda23uOkq6pP5d7 }}",
+    authParams: {
+      issuer: "default",
+      responseType: ['token', 'id_token'],
+      display: 'page'
+    }
+  });
+
+  if (oktaSignIn.token.hasTokensInUrl()) {
+    oktaSignIn.token.parseTokensFromUrl(
+      // If we get here, the user just logged in.
+      function success(res) {
+        var accessToken = res[0];
+        var idToken = res[1];
+
+        oktaSignIn.tokenManager.add('accessToken', accessToken);
+        oktaSignIn.tokenManager.add('idToken', idToken);
+
+        window.location.hash='';
+        document.getElementById("messageBox").innerHTML = "Hello, " + idToken.claims.email + "! You just logged in! :)";
+      },
+      function error(err) {
+        console.error(err);
+      }
+    );
+  } else {
+    oktaSignIn.session.get(function (res) {
+      // If we get here, the user is already signed in.
+      if (res.status === 'ACTIVE') {
+        document.getElementById("messageBox").innerHTML = "Hello, " + res.login + "! You are *still* logged in! :)";
+        return;
+      }
+      oktaSignIn.renderEl(
+        { el: '#okta-login-container' },
+        function success(res) {},
+        function error(err) {
+          console.error(err);
+        }
+      );
+    });
+  }
+</script>
+      
+      
 </body>
 </html>
